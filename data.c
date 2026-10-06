@@ -215,7 +215,11 @@ parse_page(int blkno,
 	 * Combine 2-part LSN into a single 64-bit value to match the new
 	 * XLogRecPtr definition in 9.3+
 	 */
-	*lsn = PageXLogRecPtrGet(header->pd_lsn);
+	#if PG_VERSION_NUM >= 190000
+		*lsn = PageXLogRecPtrGet(&header->pd_lsn);
+	#else
+		*lsn = PageXLogRecPtrGet(header->pd_lsn);
+	#endif
 
 	if (PageGetPageSize(pagedata) == BLCKSZ &&
 		PageGetPageLayoutVersion(pagedata) == PG_PAGE_LAYOUT_VERSION &&
