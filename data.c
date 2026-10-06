@@ -212,14 +212,11 @@ parse_page(int blkno,
 	const Page pagedata = (Page) page->data;
 
 	/*
-	 * Combine 2-part LSN into a single 64-bit value to match the new
-	 * XLogRecPtr definition in 9.3+
+	 * Get the page LSN.  pd_lsn keeps the on-disk layout (high 32 bits
+	 * first), so use PageXLogRecPtrGet() to convert it into a logical
+	 * XLogRecPtr. 
 	 */
-	#if PG_VERSION_NUM >= 190000
-		*lsn = PageXLogRecPtrGet(&header->pd_lsn);
-	#else
-		*lsn = PageXLogRecPtrGet(header->pd_lsn);
-	#endif
+	*lsn = PageXLogRecPtrGet(&header->pd_lsn);
 
 	if (PageGetPageSize(pagedata) == BLCKSZ &&
 		PageGetPageLayoutVersion(pagedata) == PG_PAGE_LAYOUT_VERSION &&
